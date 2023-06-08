@@ -17,31 +17,34 @@ const donneesB = chargerJSON(urlJSONB);
 Promise.all([donneesA, donneesB])
   .then(([dataA, dataB]) => {
     // Effectuer les comparaisons et générer le nouveau JSON
-      const differences = [];
+    const differences = [];
 
     // Parcourir les objets du fichier JSON A
     for (const objetA of dataA) {
-        const redshift = objetA["Redshift"];
-        console.log(objetA);
+      const redshift = objetA["Redshift"];
 
       // Rechercher l'objet correspondant dans le fichier JSON B
       const objetB = dataB.find((objet) => objet["Redshift"] === redshift);
-        console.log(objetB);
-        if (objetB) {
-            let difference;
-            objetA.forEach(element => {
-                // Effectuer la comparaison et calculer les différences
-                difference = {
-                  redshift: redshift,
-                  difference: Math.abs((element - objetB[element])) / objetB[element]
-                };
-        
-                // Stocker la différence dans le tableau
-                differences.push(difference); 
-            });
 
+      if (objetB) {
+        const difference = {};
+
+        // Parcourir les propriétés de l'objetA
+        for (const key in objetA) {
+          if (objetB.hasOwnProperty(key)) {
+            const valueA = objetA[key];
+            const valueB = objetB[key];
+
+            // Effectuer la comparaison et calculer la différence
+            difference[key] = Math.abs((valueA - valueB)) / valueB;
+          }
         }
+
+        // Stocker la différence dans le tableau
+        differences.push(difference);
+      }
     }
+
     // Générer un nouveau JSON à partir du tableau de différences
     const nouveauJSON = JSON.stringify(differences);
 
@@ -52,5 +55,5 @@ Promise.all([donneesA, donneesB])
     resultatDiv.textContent = nouveauJSON;
   })
   .catch(error => {
-    console.error('Une erreur s\'est produite lors du chargement des données JSON :', error);
+    console.error("Une erreur s'est produite lors du chargement des données JSON :", error);
   });
