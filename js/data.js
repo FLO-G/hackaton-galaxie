@@ -77,9 +77,8 @@ function parseTable() {
 	let tbody = document.getElementById('table').children[1];
 
 	for(let i = 0; i < tbody.childElementCount; i++) {
-		if (tbody.children[i].lastElementChild.innerHTML == "0" || tbody.children[i].lastElementChild.innerHTML == "NaN") {
+		if (tbody.children[i].firstElementChild.innerHTML != "Rank" && (tbody.children[i].lastElementChild.innerHTML == "0" || tbody.children[i].lastElementChild.innerHTML == "NaN")) {
 			tbody.children[i].style.display = (tbody.children[i].style.display == "none") ? "" : "none";
-			// i--;
 		}
 	}
 }
