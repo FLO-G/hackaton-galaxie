@@ -1,0 +1,30 @@
+/* .tabulator-col-content {
+  background-color: green !important;
+}
+
+.gen {
+  display: flex;
+}
+
+.tabulator-headers {
+  display: none !important;
+}
+.tabulator-row,
+.tabulator-table {
+  display: flex !important;
+  flex-direction: column !important;
+} */
+
+*, ::before, ::after {
+  margin: 0;
+  padding: 0;
+}
+
+table {
+  border-collapse: collapse;
+}
+th,
+td {
+  border: 1px solid black;
+  padding: 5px;
+}
