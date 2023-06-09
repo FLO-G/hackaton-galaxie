@@ -41,11 +41,11 @@ tr th {
   background-color: #a6dbf1;
 }
 
-tr:nth-child(2n+1) {
+/* tr:nth-child(2n+1) {
   background-color: #f1f1e6;
 }
 
 td:last-child {
   color: #ff6200;
   font-weight: 900;
-}
+} */

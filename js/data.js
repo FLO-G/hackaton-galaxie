@@ -40,7 +40,7 @@ function initSelector(array) {
 
 	for (let i = 0; i < array.length; i++) {
 			let option = document.createElement('option');
-			option.innerHTML = `${i}: ${array[i]["Redshift"][0]}`;
+			option.innerHTML = `${array[i]["Rank"][0]}: ${array[i]["Redshift"][0]}`;
 			option.setAttribute('id', "rank"+i);
 			selector.appendChild(option);
 	}
@@ -48,7 +48,8 @@ function initSelector(array) {
 	selector.addEventListener('change', () => {
 		let index = selector.selectedIndex;
 
-		displayArray(index, array);
+		displayArray(index-1, array);
+    parseArray()
 	});
 }
 
@@ -67,4 +68,12 @@ function displayArray(index, array) {
 			}
 			table.children[1].appendChild(tr);
 		}
+}
+
+function parseArray() {
+  let table = document.getElementById('table')
+
+  for(i=0; i<table.childElementCount[1].length; i++) {
+    console.log(table.childElementCount[1].element([i]))
+  }
 }
