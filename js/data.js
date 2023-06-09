@@ -49,7 +49,10 @@ Promise.all([dataA, dataB])
 		let index = selector.selectedIndex;
 		
 		displayArray(index - 1, array);
-		parseTable();
+		document.getElementById("removeNull").addEventListener("click", () => {
+			parseTable();
+			document.getElementById("removeNull").innerText = (document.getElementById("removeNull").innerText == "Hidden Null") ? "Show Null" : "Hidden Null";
+		})
 	});
 }
 
@@ -75,8 +78,8 @@ function parseTable() {
 
 	for(let i = 0; i < tbody.childElementCount; i++) {
 		if (tbody.children[i].lastElementChild.innerHTML == "0" || tbody.children[i].lastElementChild.innerHTML == "NaN") {
-			tbody.children[i].remove();
-			i--;
+			tbody.children[i].style.display = (tbody.children[i].style.display == "none") ? "" : "none";
+			// i--;
 		}
 	}
 }
