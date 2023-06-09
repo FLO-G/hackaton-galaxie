@@ -52,6 +52,10 @@ Promise.all([dataA, dataB])
 		document.getElementById("removeNull").addEventListener("click", () => {
 			parseTable();
 			document.getElementById("removeNull").innerText = (document.getElementById("removeNull").innerText == "Hidden Null") ? "Show Null" : "Hidden Null";
+		});
+		document.getElementById("myTreshold").addEventListener('change', (e) => {
+			document.getElementById('myValue').innerHTML = e.target.value;
+			parseTreshold(e.target.value);
 		})
 	});
 }
@@ -78,6 +82,18 @@ function parseTable() {
 
 	for(let i = 0; i < tbody.childElementCount; i++) {
 		if (tbody.children[i].firstElementChild.innerHTML != "Rank" && (tbody.children[i].lastElementChild.innerHTML == "0" || tbody.children[i].lastElementChild.innerHTML == "NaN")) {
+			tbody.children[i].style.display = (tbody.children[i].style.display == "none") ? "" : "none";
+		}
+	}
+}
+
+function parseTreshold(percentage) {
+	let tbody = document.getElementById('table').children[1];
+
+	for(let i = 0; i < tbody.childElementCount; i++) {
+		let treshold = percentage / 100;
+		console.log(treshold);
+		if (tbody.children[i].firstElementChild.innerHTML != "Rank" && (tbody.children[i].lastElementChild.innerHTML > treshold || tbody.children[i].lastElementChild.innerHTML == "NaN")) {
 			tbody.children[i].style.display = (tbody.children[i].style.display == "none") ? "" : "none";
 		}
 	}
