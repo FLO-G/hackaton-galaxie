@@ -3,11 +3,6 @@
   <head>
     <title>Tableau JSON</title>
     <style>
-      tr td,
-      tbody th td {
-        display: flex;
-        flex-direction: column;
-      }
       table {
         border-collapse: collapse;
         width: 100%;
