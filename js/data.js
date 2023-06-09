@@ -4,23 +4,11 @@ async function loadJSON(url) {
 	return data;
 }
 
-function customFormatter(cell) {
-	let value = cell.getValue();
-
-	if (value > 100)
-		cell.getElement().style.backgroundColor = "red";
-	else if (value <= 0 && cell.getField != "Rank") {
-		table.hideColumn(cell.getField()); //Bug
-	}
-	return value;
-}
-
 const urlJSONA = './data/221410_A.json';
 const urlJSONB = './data/221410_B.json';
 
 const dataA = loadJSON(urlJSONA);
 const dataB = loadJSON(urlJSONB);
-
 
 Promise.all([dataA, dataB])
 	.then(([arrayA, arrayB]) => {
@@ -29,51 +17,84 @@ Promise.all([dataA, dataB])
 		for (const objectA of arrayA) {
 			const objectB = arrayB.find((el) => el["Rank"] === objectA["Rank"]);
 			if (objectB) {
-				const result = {};
+				const result = [];
 				for (const key in objectA) {
 					if (key == "Redshift" || key == "Rank")
-						result[key] = objectA[key];
+						treshold = objectA[key];
 					else
-						result[key] = (Math.round(Math.abs(objectA[key] - objectB[key]) / objectB[key] * 100 * 100) / 100);
+						treshold = (Math.round(Math.abs(objectA[key] - objectB[key]) / objectB[key] * 100 * 100) / 100);
+
+					result[key] = [objectA[key], objectB[key], treshold];
 				}
 				arrayT.push(result);
 			}
 		}
-
-		table = new Tabulator("#resultat", {
-			data: arrayT,
-			movableColumns: true,
-			columns: [
-				{ title: "Rank", field: "Rank", formatter: customFormatter },
-				{ title: "Redshift", field: "Redshift", formatter: customFormatter },
-				{ title: "ContinuumAmplitude", field: "ContinuumAmplitude", formatter: customFormatter },
-				{ title: "ContinuumAmplitudeUncertainty", field: "ContinuumAmplitudeUncertainty", formatter: customFormatter },
-				{ title: "ContinuumIgmIndex", field: "ContinuumIgmIndex", formatter: customFormatter },
-				{ title: "ContinuumIsmCoeff", field: "ContinuumIsmCoeff", formatter: customFormatter },
-				{ title: "ContinuumName", field: "ContinuumName", formatter: customFormatter },
-				{ title: "LeastSquare", field: "LeastSquare", formatter: customFormatter },
-				{ title: "LinesRatioAmplitudeAbs", field: "LinesRatioAmplitudeAbs", formatter: customFormatter },
-				{ title: "LinesRatioAmplitudeEm", field: "LinesRatioAmplitudeEm", formatter: customFormatter },
-				{ title: "LinesRatioIsmCoeff", field: "LinesRatioIsmCoeff", formatter: customFormatter },
-				{ title: "LinesRatioName", field: "LinesRatioName", formatter: customFormatter },
-				{ title: "RedshiftLogProbaDensity", field: "RedshiftLogProbaDensity", formatter: customFormatter },
-				{ title: "RedshiftProba", field: "RedshiftProba", formatter: customFormatter },
-				{ title: "RedshiftProbaZmax", field: "RedshiftProbaZmax", formatter: customFormatter },
-				{ title: "RedshiftProbaZmin", field: "RedshiftProbaZmin", formatter: customFormatter },
-				{ title: "RedshiftUncertainty", field: "RedshiftUncertainty", formatter: customFormatter },
-				{ title: "StrongEmissionLinesSNR", field: "StrongEmissionLinesSNR", formatter: customFormatter },
-				{ title: "SubType", field: "SubType", formatter: customFormatter },
-				{ title: "VelocityAbsorption", field: "VelocityAbsorption", formatter: customFormatter },
-				{ title: "VelocityEmission", field: "VelocityEmission", formatter: customFormatter },
-				{ title: "abs_deltaZ", field: "abs_deltaZ", formatter: customFormatter },
-				{ title: "lfHa", field: "lfHa", formatter: customFormatter },
-				{ title: "lfOII", field: "lfOII", formatter: customFormatter },
-				{ title: "snrHa", field: "snrHa", formatter: customFormatter },
-				{ title: "snrOII", field: "snrOII", formatter: customFormatter },
-			]
-		})
-		console.log(table)
+		initSelector(arrayT);
 	})
 	.catch(error => {
 		console.error('Une erreur s\'est produite lors du chargement des données JSON :', error);
 	});
+
+	function initSelector(array) {
+	let selector = document.getElementById('selector');
+	
+	for (let i = 0; i < array.length; i++) {
+		let option = document.createElement('option');
+		option.innerHTML = `${array[i]["Rank"][0]}: ${array[i]["Redshift"][0]}`;
+		option.setAttribute('id', "rank" + i);
+		selector.appendChild(option);
+	}
+	
+	selector.addEventListener('change', () => {
+		let index = selector.selectedIndex;
+		
+		displayArray(index - 1, array);
+		document.getElementById("removeNull").addEventListener("click", () => {
+			parseTable();
+			document.getElementById("removeNull").innerText = (document.getElementById("removeNull").innerText == "Hidden Null") ? "Show Null" : "Hidden Null";
+		});
+		document.getElementById("myTreshold").addEventListener('change', (e) => {
+			document.getElementById('myValue').innerHTML = e.target.value;
+			parseTreshold(e.target.value);
+		})
+	});
+}
+
+function displayArray(index, array) {
+	let table = document.getElementById('table');
+	table.children[1].innerText = "";
+	for (key in array[index]) {
+		let tr = document.createElement('tr');
+		let td = document.createElement('td');
+		td.innerHTML = key;
+		tr.appendChild(td);
+		for (let j = 0; j < array[index][key].length; j++) {
+			let td = document.createElement('td');
+			td.innerHTML = array[index][key][j];
+			tr.appendChild(td);
+		}
+		table.children[1].appendChild(tr);
+	}
+}
+
+function parseTable() {
+	let tbody = document.getElementById('table').children[1];
+
+	for(let i = 0; i < tbody.childElementCount; i++) {
+		if (tbody.children[i].firstElementChild.innerHTML != "Rank" && (tbody.children[i].lastElementChild.innerHTML == "0" || tbody.children[i].lastElementChild.innerHTML == "NaN")) {
+			tbody.children[i].style.display = (tbody.children[i].style.display == "none") ? "" : "none";
+		}
+	}
+}
+
+function parseTreshold(percentage) {
+	let tbody = document.getElementById('table').children[1];
+
+	for(let i = 0; i < tbody.childElementCount; i++) {
+		let treshold = percentage / 100;
+		console.log(treshold);
+		if (tbody.children[i].firstElementChild.innerHTML != "Rank" && (tbody.children[i].lastElementChild.innerHTML > treshold || tbody.children[i].lastElementChild.innerHTML == "NaN")) {
+			tbody.children[i].style.display = (tbody.children[i].style.display == "none") ? "" : "none";
+		}
+	}
+}
