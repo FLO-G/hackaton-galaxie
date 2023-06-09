@@ -29,23 +29,42 @@ Promise.all([dataA, dataB])
 				arrayT.push(result);
 			}
 		}
-		console.log(typeof arrayT);
-		let table = document.getElementById('table');
-		for (let i = 0; i < arrayT.length; i++) {
-			for (key in arrayT[i]) {
-				let tr = document.createElement('tr');
-				let td = document.createElement('td');
-				td.innerHTML = key;
-				tr.appendChild(td);
-				for (let j = 0; j < arrayT[i][key].length; j++) {
-					let td = document.createElement('td');
-					td.innerHTML = arrayT[i][key][j];
-					tr.appendChild(td);
-				}
-				table.children[1].appendChild(tr);
-			}
-		}
+		initSelector(arrayT);
 	})
 	.catch(error => {
 		console.error('Une erreur s\'est produite lors du chargement des données JSON :', error);
 	});
+
+function initSelector(array) {
+	let selector = document.getElementById('selector');
+
+	for (let i = 0; i < array.length; i++) {
+			let option = document.createElement('option');
+			option.innerHTML = `${i}: ${array[i]["Redshift"][0]}`;
+			option.setAttribute('id', "rank"+i);
+			selector.appendChild(option);
+	}
+
+	selector.addEventListener('change', () => {
+		let index = selector.selectedIndex;
+
+		displayArray(index, array);
+	});
+}
+
+function displayArray(index, array) {
+	let table = document.getElementById('table');
+	table.children[1].innerText = "";
+		for (key in array[index]) {
+			let tr = document.createElement('tr');
+			let td = document.createElement('td');
+			td.innerHTML = key;
+			tr.appendChild(td);
+			for (let j = 0; j < array[index][key].length; j++) {
+				let td = document.createElement('td');
+				td.innerHTML = array[index][key][j];
+				tr.appendChild(td);
+			}
+			table.children[1].appendChild(tr);
+		}
+}
