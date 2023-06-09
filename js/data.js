@@ -1,102 +1,100 @@
-// // Fonction pour charger les données JSON à partir d'une URL
-// async function chargerJSON(url) {
-//   const response = await fetch(url);
-//   const data = await response.json();
-//   return data;
-// }
+async function loadJSON(url) {
+	const response = await fetch(url);
+	const data = await response.json();
+	return data;
+}
 
-// // Charger les données du fichier JSON A
-// const urlJSONA = './data/221410_A.json';
-// const donneesA = chargerJSON(urlJSONA);
+const urlJSONA = './data/221410_A.json';
+const urlJSONB = './data/221410_B.json';
 
-// // Charger les données du fichier JSON B
-// const urlJSONB = './data/221410_B.json';
-// const donneesB = chargerJSON(urlJSONB);
+const dataA = loadJSON(urlJSONA);
+const dataB = loadJSON(urlJSONB);
 
-// // Utiliser les données récupérées
-// Promise.all([donneesA, donneesB])
-//   .then(([dataA, dataB]) => {
-//     // Effectuer les comparaisons et générer le nouveau JSON
-//     const differences = [];
+Promise.all([dataA, dataB])
+	.then(([arrayA, arrayB]) => {
+		const arrayT = [];
 
-//     // Parcourir les objets du fichier JSON A
-//     for (const objetA of dataA) {
-//       const redshift = objetA["Redshift"];
+		for (const objectA of arrayA) {
+			const objectB = arrayB.find((el) => el["Rank"] === objectA["Rank"]);
+			if (objectB) {
+				const result = [];
+				for (const key in objectA) {
+					if (key == "Redshift" || key == "Rank")
+						treshold = objectA[key];
+					else
+						treshold = (Math.round(Math.abs(objectA[key] - objectB[key]) / objectB[key] * 100 * 100) / 100);
 
-//       // Rechercher l'objet correspondant dans le fichier JSON B
-//       const objetB = dataB.find((objet) => objet["Redshift"] === redshift);
+					result[key] = [objectA[key], objectB[key], treshold];
+				}
+				arrayT.push(result);
+			}
+		}
+		initSelector(arrayT);
+	})
+	.catch(error => {
+		console.error('Une erreur s\'est produite lors du chargement des données JSON :', error);
+	});
 
-//       if (objetB) {
-//         const difference = {};
+	function initSelector(array) {
+	let selector = document.getElementById('selector');
+	
+	for (let i = 0; i < array.length; i++) {
+		let option = document.createElement('option');
+		option.innerHTML = `${array[i]["Rank"][0]}: ${array[i]["Redshift"][0]}`;
+		option.setAttribute('id', "rank" + i);
+		selector.appendChild(option);
+	}
+	
+	selector.addEventListener('change', () => {
+		let index = selector.selectedIndex;
+		
+		displayArray(index - 1, array);
+		document.getElementById("removeNull").addEventListener("click", () => {
+			parseTable();
+			document.getElementById("removeNull").innerText = (document.getElementById("removeNull").innerText == "Hidden Null") ? "Show Null" : "Hidden Null";
+		});
+		document.getElementById("myTreshold").addEventListener('change', (e) => {
+			document.getElementById('myValue').innerHTML = e.target.value;
+			parseTreshold(e.target.value);
+		})
+	});
+}
 
-//         // Parcourir les propriétés de l'objetA
-//         for (const key in objetA) {
-//           if (objetB.hasOwnProperty(key)) {
-//             const valueA = objetA[key];
-//             const valueB = objetB[key];
+function displayArray(index, array) {
+	let table = document.getElementById('table');
+	table.children[1].innerText = "";
+	for (key in array[index]) {
+		let tr = document.createElement('tr');
+		let td = document.createElement('td');
+		td.innerHTML = key;
+		tr.appendChild(td);
+		for (let j = 0; j < array[index][key].length; j++) {
+			let td = document.createElement('td');
+			td.innerHTML = array[index][key][j];
+			tr.appendChild(td);
+		}
+		table.children[1].appendChild(tr);
+	}
+}
 
-//             // Effectuer la comparaison et calculer la différence
-//             difference[key] = Math.abs((valueA - valueB)) / valueB;
-//           }
-//         }
+function parseTable() {
+	let tbody = document.getElementById('table').children[1];
 
-//         // Stocker la différence dans le tableau
-//         differences.push(difference);
-//       }
-//     }
+	for(let i = 0; i < tbody.childElementCount; i++) {
+		if (tbody.children[i].firstElementChild.innerHTML != "Rank" && (tbody.children[i].lastElementChild.innerHTML == "0" || tbody.children[i].lastElementChild.innerHTML == "NaN")) {
+			tbody.children[i].style.display = (tbody.children[i].style.display == "none") ? "" : "none";
+		}
+	}
+}
 
-//     // Générer un nouveau JSON à partir du tableau de différences
-//     const nouveauJSON = JSON.stringify(differences);
+function parseTreshold(percentage) {
+	let tbody = document.getElementById('table').children[1];
 
-//     // Sélectionner la div par son ID
-//     const resultatDiv = document.getElementById('resultat');
-
-//     // Mettre à jour le contenu de la div avec le nouveau JSON
-//     resultatDiv.textContent = nouveauJSON;
-//   })
-//   .catch(error => {
-//     console.error("Une erreur s'est produite lors du chargement des données JSON :", error);
-//   });
-
-
-// // const array1 = {
-// //   a: 'hello',
-// //   b: '42',
-// //   c: 'false'
-// // };
-// // async function test(){
-
-// //   async function loadJSON(url) {
-// //     const response = await fetch(url);
-// //     data =   response.json();
-// //     return data;
-// //   }
-  
-// //   const urlJSONA = './data/221410_A.json';
-// // const array1 = await loadJSON(urlJSONA);
-
-// // console.log(array1)
-
-// // const keys = Object.keys(array1);
-// // const tableData = [];
-
-
-// // keys.forEach((key) => {
-// //   const rowData = {
-// //     key: key,
-// //     value: array1[key]
-// //   };
-// //   tableData.push(rowData);
-// // });
-
-// // // Utilisez le tableau tableData pour créer le tableau Tabulator
-// // const table = new Tabulator("#example-table", {
-// //   data: tableData,
-// //   layout: "fitColumns",
-// //   columns: [
-// //     { title: "Name", field: "key" },
-// //     { title: "Data A", field: "value" }
-// //   ]
-// // });
-// // }
-// // test().then(() => console.log("coucou"))
+	for(let i = 0; i < tbody.childElementCount; i++) {
+		let treshold = percentage / 100;
+		console.log(treshold);
+		if (tbody.children[i].firstElementChild.innerHTML != "Rank" && (tbody.children[i].lastElementChild.innerHTML > treshold || tbody.children[i].lastElementChild.innerHTML == "NaN")) {
+			tbody.children[i].style.display = (tbody.children[i].style.display == "none") ? "" : "none";
+		}
+	}
+}
