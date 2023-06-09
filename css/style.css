@@ -15,9 +15,12 @@
   flex-direction: column !important;
 } */
 
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&family=Roboto&display=swap');
+
 *, ::before, ::after {
   margin: 0;
   padding: 0;
+  font-family: 'Roboto', sans-serif;
 }
 
 table {
@@ -25,6 +28,24 @@ table {
 }
 th,
 td {
-  border: 1px solid black;
+  border-bottom: 1px solid black;
   padding: 5px;
+}
+
+td:nth-child(2), 
+td:nth-child(3) {
+  text-align: center;
+}
+
+tr th {
+  background-color: #a6dbf1;
+}
+
+tr:nth-child(2n+1) {
+  background-color: #f1f1e6;
+}
+
+td:last-child {
+  color: #ff6200;
+  font-weight: 900;
 }
